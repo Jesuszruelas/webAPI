@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "8d3e9150-13f6-4f77-98be-9b3f309a4d8c",
+		"name": "API Empleados - MongoDB Atlas & Vercel",
+		"description": "Colección de pruebas para la API REST de la colección 'Empleados' en MongoDB Atlas hospedada en Vercel.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://miapi-pi.vercel.app",
+			"type": "string"
+		},
+		{
+			"key": "localUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Estado del Servicio (Health Check)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "Verifica que el servicio esté activo en Vercel y devuelve la documentación de endpoints."
+			},
+			"response": []
+		},
+		{
+			"name": "1. POST - Registrar Empleado",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Clave\": 101,\n  \"Nombre\": \"Carlos Mendoza López\",\n  \"dirección\": \"Av. Revolución #450, Col. Centro\",\n  \"fechadenacimiento\": \"1992-05-14\",\n  \"sexo\": \"M\",\n  \"tipodesangre\": \"O+\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/empleados",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"empleados"
+					]
+				},
+				"description": "Inserta un nuevo documento en la colección 'Empleados' de MongoDB Atlas."
+			},
+			"response": []
+		},
+		{
+			"name": "2. GET - Obtener Todos los Empleados",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/empleados",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"empleados"
+					]
+				},
+				"description": "Devuelve la lista completa de todos los empleados ordenados por Clave."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET - Obtener Empleado por Clave",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/empleados/101",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"empleados",
+						"101"
+					]
+				},
+				"description": "Busca y devuelve un empleado específico utilizando su Clave numérica."
+			},
+			"response": []
+		},
+		{
+			"name": "4. PUT - Actualizar Empleado por Clave",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Nombre\": \"Carlos Mendoza López (Actualizado)\",\n  \"dirección\": \"Blvd. Paseo de los Héroes #1200, Zona Río\",\n  \"sexo\": \"Masculino\",\n  \"tipodesangre\": \"O+\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/empleados/101",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"empleados",
+						"101"
+					]
+				},
+				"description": "Actualiza uno o varios campos del empleado identificado por su Clave."
+			},
+			"response": []
+		},
+		{
+			"name": "5. DELETE - Eliminar Empleado por Clave",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/empleados/101",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"empleados",
+						"101"
+					]
+				},
+				"description": "Elimina permanentemente el empleado de la colección 'Empleados' por su Clave."
+			},
+			"response": []
+		}
+	]
+}

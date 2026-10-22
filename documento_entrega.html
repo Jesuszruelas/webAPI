@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Servicio API REST - MongoDB Atlas y Vercel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        @page {
+            size: letter;
+            margin: 1.8cm 1.5cm 1.8cm 1.5cm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.55;
+            font-size: 10.5pt;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- PORTADA --- */
+        .portada {
+            page-break-after: always;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2.5cm 1cm 1.5cm 1cm;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+        }
+
+        .portada-header {
+            border-bottom: 3px solid #0284c7;
+            padding-bottom: 25px;
+        }
+
+        .portada-institucion {
+            font-size: 15pt;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .portada-facultad {
+            font-size: 11pt;
+            font-weight: 500;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .portada-body {
+            margin: auto 0;
+            padding: 20px 0;
+        }
+
+        .badge-tecnologia {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            border: 1px solid #bae6fd;
+        }
+
+        .portada-titulo {
+            font-size: 23pt;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.25;
+            margin: 0 0 16px 0;
+        }
+
+        .portada-subtitulo {
+            font-size: 12.5pt;
+            color: #475569;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .portada-footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            text-align: left;
+            font-size: 9.5pt;
+        }
+
+        .datos-col {
+            flex: 1;
+        }
+
+        .datos-label {
+            font-weight: 700;
+            color: #0284c7;
+            text-transform: uppercase;
+            font-size: 8pt;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .datos-val {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 10pt;
+            margin-bottom: 12px;
+        }
+
+        /* --- CONTENIDO --- */
+        .page {
+            page-break-after: always;
+            padding-top: 10px;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #0f172a;
+            border-left: 4px solid #0284c7;
+            padding-left: 10px;
+            margin-top: 20px;
+            margin-bottom: 14px;
+        }
+
+        h3 {
+            font-size: 11.5pt;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin: 0 0 10px 0;
+            color: #334155;
+            text-align: justify;
+        }
+
+        /* Cards y Cajas de Información */
+        .info-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 9.5pt;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-key {
+            font-weight: 600;
+            color: #0f172a;
+            width: 170px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #334155;
+            flex-grow: 1;
+            word-break: break-all;
+        }
+
+        .url-link {
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9pt;
+        }
+
+        /* Badges de Métodos HTTP */
+        .method-badge {
+            display: inline-block;
+            font-weight: 700;
+            font-size: 8pt;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .method-get { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .method-post { background-color: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .method-put { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .method-delete { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 16px;
+            font-size: 9pt;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 8.5pt;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 7px 10px;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Bloques de Código */
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            line-height: 1.45;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 8px 0 14px 0;
+            border: 1px solid #1e293b;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #f1f5f9;
+            color: #0369a1;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 8.5pt;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .code-title {
+            font-size: 8pt;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .alert-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            border-radius: 0 6px 6px 0;
+            font-size: 9pt;
+            color: #92400e;
+        }
+
+        .alert-box strong {
+            color: #78350f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTADA -->
+    <div class="portada">
+        <div class="portada-header">
+            <div class="portada-institucion">Proyecto de Desarrollo de Servicios Web & Cloud</div>
+            <div class="portada-facultad">Bases de Datos No Relacionales • Arquitectura REST</div>
+        </div>
+
+        <div class="portada-body">
+            <div class="badge-tecnologia">Node.js • Express • MongoDB Atlas • Vercel</div>
+            <h1 class="portada-titulo">DOCUMENTACIÓN Y REPORTE TÉCNICO:<br>SERVICIO API REST PARA COLECCIÓN "EMPLEADOS"</h1>
+            <p class="portada-subtitulo">
+                Adaptación, implementación completa de operaciones CRUD (POST, GET, PUT, DELETE), persistencia en clúster NoSQL MongoDB Atlas y despliegue serverless en la nube con Vercel.
+            </p>
+        </div>
+
+        <div class="portada-footer">
+            <div class="datos-col">
+                <div class="datos-label">Autor / Desarrollador</div>
+                <div class="datos-val">Jesús Zamora</div>
+
+                <div class="datos-label">Plataforma de Hosting</div>
+                <div class="datos-val">Vercel Cloud (Serverless Architecture)</div>
+            </div>
+
+            <div class="datos-col" style="text-align: right;">
+                <div class="datos-label">Base de Datos</div>
+                <div class="datos-val">MongoDB Atlas (No-Relational DB)</div>
+
+                <div class="datos-label">Fecha de Entrega</div>
+                <div class="datos-val">Octubre 2026</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA 1: DATOS GENERALES Y ARQUITECTURA -->
+    <div class="page">
+        <h2>1. Información General del Servicio y Hosting</h2>
+        <p>
+            El presente proyecto expone un servicio API REST desarrollado con <strong>Node.js</strong> y <strong>Express</strong>, integrado mediante el ODM <strong>Mongoose</strong> hacia una base de datos No Relacional alojada en <strong>MongoDB Atlas</strong>, y publicado en producción de manera continua a través de <strong>Vercel</strong> como funciones Serverless de alta disponibilidad.
+        </p>
+
+        <div class="info-card">
+            <div class="info-row">
+                <div class="info-key">Proveedor de Hosting:</div>
+                <div class="info-value"><strong>Vercel</strong> (Vercel Serverless Functions)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">URL Base de Producción:</div>
+                <div class="info-value"><a class="url-link" href="https://miapi-pi.vercel.app">https://miapi-pi.vercel.app</a></div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">URL Endpoint Principal:</div>
+                <div class="info-value"><a class="url-link" href="https://miapi-pi.vercel.app/api/empleados">https://miapi-pi.vercel.app/api/empleados</a></div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">Repositorio GitHub:</div>
+                <div class="info-value"><a class="url-link" href="https://github.com/Jesuszruelas/webAPI">https://github.com/Jesuszruelas/webAPI</a></div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">Herramienta de Prueba:</div>
+                <div class="info-value"><strong>Postman</strong> (REST Client / Automated Runner)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">Base de Datos:</div>
+                <div class="info-value">MongoDB Atlas Cluster (Base de datos: <code>miBD</code>)</div>
+            </div>
+            <div class="info-row">
+                <div class="info-key">Nombre de la Colección:</div>
+                <div class="info-value"><strong><code>Empleados</code></strong> (Colección No Relacional)</div>
+            </div>
+        </div>
+
+        <h2>2. Especificación del Modelo de Datos ("Empleados")</h2>
+        <p>
+            La colección <strong>"Empleados"</strong> fue adaptada rigurosamente a las especificaciones requeridas, garantizando tipos de datos fuertemente validados y almacenamiento nativo de fechas en formato <strong>BSON Date</strong>:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Tipo de Dato</th>
+                    <th>Tipo en Mongo/BSON</th>
+                    <th>Obligatorio</th>
+                    <th>Descripción y Reglas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Clave</strong></td>
+                    <td>Numérica</td>
+                    <td><code>Number / Double</code></td>
+                    <td>Sí (Única)</td>
+                    <td>Identificador numérico principal único del empleado.</td>
+                </tr>
+                <tr>
+                    <td><strong>Nombre</strong></td>
+                    <td>Texto</td>
+                    <td><code>String</code></td>
+                    <td>Sí</td>
+                    <td>Nombre completo del empleado (soporta espacios y acentos).</td>
+                </tr>
+                <tr>
+                    <td><strong>dirección</strong></td>
+                    <td>Texto</td>
+                    <td><code>String</code></td>
+                    <td>Sí</td>
+                    <td>Domicilio o dirección residencial del empleado.</td>
+                </tr>
+                <tr>
+                    <td><strong>fechadenacimiento</strong></td>
+                    <td>BSON Date</td>
+                    <td><code>Date (ISODate)</code></td>
+                    <td>Sí</td>
+                    <td>Fecha de nacimiento almacenada nativamente como BSON Date.</td>
+                </tr>
+                <tr>
+                    <td><strong>sexo</strong></td>
+                    <td>Numérico o Texto</td>
+                    <td><code>Mixed (String/Number)</code></td>
+                    <td>Sí</td>
+                    <td>Acepta texto ("M", "F", "Masculino") o código numérico (1, 2).</td>
+                </tr>
+                <tr>
+                    <td><strong>tipodesangre</strong></td>
+                    <td>Texto</td>
+                    <td><code>String</code></td>
+                    <td>Sí</td>
+                    <td>Grupo sanguíneo y factor Rh (ej: "O+", "A+", "B-").</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert-box">
+            <strong>Nota de Conexión en MongoDB Atlas:</strong> Para que Vercel (o cualquier cliente en la nube) pueda comunicarse con el clúster Atlas, debe estar habilitada la regla de red <code>0.0.0.0/0</code> (Allow Access from Anywhere) en <em>Network Access</em> de MongoDB Atlas.
+        </div>
+    </div>
+
+    <!-- PÁGINA 2: ESPECIFICACIÓN DE ENDPOINTS Y EJEMPLOS RAW JSON PARA POSTMAN -->
+    <div class="page">
+        <h2>3. Ligas y URLs para Pruebas en el Hosting (En la Nube)</h2>
+        <p>A continuación se detallan las rutas del servicio publicado en la nube para ser ejecutadas en Postman:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Endpoint en la Nube (Vercel)</th>
+                    <th>Descripción de la Operación</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>https://miapi-pi.vercel.app/</code></td>
+                    <td>Verifica el estado del servicio y lista la documentación interactiva.</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>https://miapi-pi.vercel.app/api/empleados</code></td>
+                    <td>Consulta y retorna todos los documentos de la colección <em>Empleados</em>.</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-get">GET</span></td>
+                    <td><code>https://miapi-pi.vercel.app/api/empleados/:clave</code></td>
+                    <td>Consulta un empleado específico por su <em>Clave</em> numérica o por su <em>_id</em>.</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-post">POST</span></td>
+                    <td><code>https://miapi-pi.vercel.app/api/empleados</code></td>
+                    <td>Crea e inserta un nuevo empleado en MongoDB Atlas con validación de datos.</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-put">PUT</span></td>
+                    <td><code>https://miapi-pi.vercel.app/api/empleados/:clave</code></td>
+                    <td>Actualiza los campos de un empleado existente identificado por su <em>Clave</em>.</td>
+                </tr>
+                <tr>
+                    <td><span class="method-badge method-delete">DELETE</span></td>
+                    <td><code>https://miapi-pi.vercel.app/api/empleados/:clave</code></td>
+                    <td>Elimina permanentemente el empleado especificado por su <em>Clave</em>.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Ejemplos de RAW JSON para Pruebas en Postman</h2>
+
+        <h3>A) Operación POST — Crear Empleado</h3>
+        <p><strong>Configuración en Postman:</strong> Seleccionar método <code>POST</code>, URL <code>https://miapi-pi.vercel.app/api/empleados</code>, pestaña <em>Body</em> &gt; <em>raw</em> &gt; formato <em>JSON</em>.</p>
+        <div class="code-title">Payload RAW JSON de Entrada:</div>
+<pre>{
+  "Clave": 101,
+  "Nombre": "Carlos Mendoza López",
+  "dirección": "Av. Revolución #450, Col. Centro",
+  "fechadenacimiento": "1992-05-14",
+  "sexo": "M",
+  "tipodesangre": "O+"
+}</pre>
+        <div class="code-title">Respuesta Esperada de la API (HTTP 201 Created):</div>
+<pre>{
+  "mensaje": "Empleado registrado exitosamente",
+  "empleado": {
+    "Clave": 101,
+    "Nombre": "Carlos Mendoza López",
+    "dirección": "Av. Revolución #450, Col. Centro",
+    "fechadenacimiento": "1992-05-14T00:00:00.000Z",
+    "sexo": "M",
+    "tipodesangre": "O+",
+    "_id": "67b9d4e5f123456789abcdef",
+    "createdAt": "2026-10-22T20:25:00.000Z",
+    "updatedAt": "2026-10-22T20:25:00.000Z"
+  }
+}</pre>
+    </div>
+
+    <!-- PÁGINA 3: OPERACIONES GET, PUT Y DELETE -->
+    <div class="page">
+        <h3>B) Operación GET — Listar Todos los Empleados</h3>
+        <p><strong>Configuración en Postman:</strong> Método <code>GET</code> hacia <code>https://miapi-pi.vercel.app/api/empleados</code>.</p>
+        <div class="code-title">Respuesta Esperada de la API (HTTP 200 OK):</div>
+<pre>{
+  "total": 1,
+  "datos": [
+    {
+      "_id": "67b9d4e5f123456789abcdef",
+      "Clave": 101,
+      "Nombre": "Carlos Mendoza López",
+      "dirección": "Av. Revolución #450, Col. Centro",
+      "fechadenacimiento": "1992-05-14T00:00:00.000Z",
+      "sexo": "M",
+      "tipodesangre": "O+",
+      "createdAt": "2026-10-22T20:25:00.000Z",
+      "updatedAt": "2026-10-22T20:25:00.000Z"
+    }
+  ]
+}</pre>
+
+        <h3>C) Operación GET — Consultar Empleado por Clave</h3>
+        <p><strong>Configuración en Postman:</strong> Método <code>GET</code> hacia <code>https://miapi-pi.vercel.app/api/empleados/101</code>.</p>
+        <div class="code-title">Respuesta Esperada de la API (HTTP 200 OK):</div>
+<pre>{
+  "_id": "67b9d4e5f123456789abcdef",
+  "Clave": 101,
+  "Nombre": "Carlos Mendoza López",
+  "dirección": "Av. Revolución #450, Col. Centro",
+  "fechadenacimiento": "1992-05-14T00:00:00.000Z",
+  "sexo": "M",
+  "tipodesangre": "O+"
+}</pre>
+
+        <h3>D) Operación PUT — Actualizar Empleado</h3>
+        <p><strong>Configuración en Postman:</strong> Método <code>PUT</code> hacia <code>https://miapi-pi.vercel.app/api/empleados/101</code>, pestaña <em>Body</em> &gt; <em>raw</em> &gt; <em>JSON</em>.</p>
+        <div class="code-title">Payload RAW JSON de Entrada:</div>
+<pre>{
+  "Nombre": "Carlos Mendoza López (Actualizado)",
+  "dirección": "Blvd. Paseo de los Héroes #1200, Zona Río",
+  "tipodesangre": "O-"
+}</pre>
+        <div class="code-title">Respuesta Esperada de la API (HTTP 200 OK):</div>
+<pre>{
+  "mensaje": "Empleado actualizado exitosamente",
+  "empleado": {
+    "_id": "67b9d4e5f123456789abcdef",
+    "Clave": 101,
+    "Nombre": "Carlos Mendoza López (Actualizado)",
+    "dirección": "Blvd. Paseo de los Héroes #1200, Zona Río",
+    "fechadenacimiento": "1992-05-14T00:00:00.000Z",
+    "sexo": "M",
+    "tipodesangre": "O-"
+  }
+}</pre>
+
+        <h3>E) Operación DELETE — Eliminar Empleado</h3>
+        <p><strong>Configuración en Postman:</strong> Método <code>DELETE</code> hacia <code>https://miapi-pi.vercel.app/api/empleados/101</code>.</p>
+        <div class="code-title">Respuesta Esperada de la API (HTTP 200 OK):</div>
+<pre>{
+  "mensaje": "Empleado eliminado exitosamente de la colección Empleados",
+  "empleado": {
+    "_id": "67b9d4e5f123456789abcdef",
+    "Clave": 101,
+    "Nombre": "Carlos Mendoza López (Actualizado)"
+  }
+}</pre>
+    </div>
+
+    <!-- PÁGINA 4: CÓDIGO FUENTE DEL SERVICIO (PARTE 1) -->
+    <div class="page">
+        <h2>5. Código Fuente Completo del Servicio</h2>
+        <p>A continuación se presenta el código fuente modularizado y adaptado para arquitectura serverless en Vercel:</p>
+
+        <div class="code-title">Archivo: index.js (Lógica Principal del Servicio Express & Mongoose)</div>
+<pre>require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+
+// Middlewares globales
+app.use(cors());
+app.use(express.json());
+
+// Conexión reutilizable a MongoDB Atlas (Serverless-friendly)
+let cachedDb = null;
+
+async function connectToDatabase() {
+    if (cachedDb && mongoose.connection.readyState === 1) {
+        return cachedDb;
+    }
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+        throw new Error('La variable de entorno MONGO_URI no está configurada.');
+    }
+    cachedDb = await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
+    return cachedDb;
+}
+
+// Esquema y Modelo para la colección "Empleados"
+const empleadoSchema = new mongoose.Schema({
+    Clave: {
+        type: Number,
+        required: [true, 'El campo Clave (numérica) es obligatorio'],
+        unique: true
+    },
+    Nombre: {
+        type: String,
+        required: [true, 'El campo Nombre (texto) es obligatorio'],
+        trim: true
+    },
+    dirección: {
+        type: String,
+        required: [true, 'El campo dirección (texto) es obligatorio'],
+        trim: true,
+        alias: 'direccion'
+    },
+    fechadenacimiento: {
+        type: Date,
+        required: [true, 'El campo fechadenacimiento (BSON Date) es obligatorio']
+    },
+    sexo: {
+        type: mongoose.Schema.Types.Mixed,
+        required: [true, 'El campo sexo (numérico o texto) es obligatorio']
+    },
+    tipodesangre: {
+        type: String,
+        required: [true, 'El campo tipodesangre (texto) es obligatorio'],
+        trim: true
+    }
+}, { timestamps: true, versionKey: false });
+
+const Empleado = mongoose.models.Empleado || mongoose.model('Empleado', empleadoSchema, 'Empleados');
+
+// Helper de normalización
+function normalizarDatosEmpleado(data) {
+    const n = {};
+    if (data.Clave !== undefined || data.clave !== undefined) n.Clave = Number(data.Clave ?? data.clave);
+    if (data.Nombre !== undefined || data.nombre !== undefined) n.Nombre = String(data.Nombre ?? data.nombre).trim();
+    if (data.dirección !== undefined || data.direccion !== undefined) n.dirección = String(data.dirección ?? data.direccion).trim();
+    if (data.fechadenacimiento || data.fechaDeNacimiento) n.fechadenacimiento = new Date(data.fechadenacimiento || data.fechaDeNacimiento);
+    if (data.sexo !== undefined || data.Sexo !== undefined) n.sexo = data.sexo ?? data.Sexo;
+    if (data.tipodesangre || data.tipoDeSangre) n.tipodesangre = String(data.tipodesangre || data.tipoDeSangre).trim();
+    return n;
+}
+
+// Middleware de verificación de BD
+const requireDB = async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (error) {
+        res.status(500).json({ error: 'Error al conectar con MongoDB Atlas', detalle: error.message });
+    }
+};</pre>
+    </div>
+
+    <!-- PÁGINA 5: CÓDIGO FUENTE (PARTE 2) Y CONFIGURACIÓN VERCEL -->
+    <div class="page">
+        <div class="code-title">Archivo: index.js (Continuación: Endpoints REST)</div>
+<pre>// GET: Listar todos los empleados
+app.get('/api/empleados', requireDB, async (req, res) => {
+    try {
+        const empleados = await Empleado.find().sort({ Clave: 1 });
+        res.status(200).json({ total: empleados.length, datos: empleados });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al consultar empleados', mensaje: error.message });
+    }
+});
+
+// GET: Obtener un empleado por Clave o _id
+app.get('/api/empleados/:identificador', requireDB, async (req, res) => {
+    try {
+        const { identificador } = req.params;
+        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
+        const empleado = await Empleado.findOne(filtro);
+        if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
+        res.status(200).json(empleado);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST: Registrar un nuevo empleado
+app.post('/api/empleados', requireDB, async (req, res) => {
+    try {
+        const datos = normalizarDatosEmpleado(req.body);
+        const existente = await Empleado.findOne({ Clave: datos.Clave });
+        if (existente) return res.status(409).json({ error: `La Clave ${datos.Clave} ya está registrada.` });
+        const nuevo = new Empleado(datos);
+        const guardado = await nuevo.save();
+        res.status(201).json({ mensaje: 'Empleado registrado exitosamente', empleado: guardado });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al crear empleado', mensaje: error.message });
+    }
+});
+
+// PUT: Actualizar empleado por Clave o _id
+app.put('/api/empleados/:identificador', requireDB, async (req, res) => {
+    try {
+        const { identificador } = req.params;
+        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
+        const actualizados = normalizarDatosEmpleado(req.body);
+        const empleado = await Empleado.findOneAndUpdate(filtro, { $set: actualizados }, { returnDocument: 'after', runValidators: true });
+        if (!empleado) return res.status(404).json({ error: 'Empleado no encontrado' });
+        res.status(200).json({ mensaje: 'Empleado actualizado exitosamente', empleado });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// DELETE: Eliminar empleado por Clave o _id
+app.delete('/api/empleados/:identificador', requireDB, async (req, res) => {
+    try {
+        const { identificador } = req.params;
+        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
+        const eliminado = await Empleado.findOneAndDelete(filtro);
+        if (!eliminado) return res.status(404).json({ error: 'Empleado no encontrado' });
+        res.status(200).json({ mensaje: 'Empleado eliminado exitosamente', empleado: eliminado });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
+    app.listen(PORT, () => console.log(`Servidor local en puerto ${PORT}`));
+}
+module.exports = app;</pre>
+
+        <div style="display: flex; gap: 14px;">
+            <div style="flex: 1;">
+                <div class="code-title">Archivo: vercel.json</div>
+<pre>{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
+  ]
+}</pre>
+            </div>
+            <div style="flex: 1;">
+                <div class="code-title">Archivo: api/index.js</div>
+<pre>const app = require('../index');
+
+module.exports = app;</pre>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
