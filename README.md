@@ -11,7 +11,7 @@ Servicio API REST desarrollado con Node.js y Express, conectado a una base de da
 
 ## Esquema de la Coleccion (Empleados)
 
-- Clave: Numerica (unica y obligatoria)
+- Clave: Numerica (obligatoria)
 - Nombre: Texto (obligatorio)
 - direccion: Texto (obligatorio)
 - fechadenacimiento: BSON Date (obligatorio, formato YYYY-MM-DD)

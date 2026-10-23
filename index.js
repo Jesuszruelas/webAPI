@@ -32,8 +32,7 @@ async function connectToDatabase() {
 const empleadoSchema = new mongoose.Schema({
     Clave: {
         type: Number,
-        required: [true, 'El campo Clave es obligatorio'],
-        unique: true
+        required: [true, 'El campo Clave es obligatorio']
     },
     Nombre: {
         type: String,
@@ -162,11 +161,6 @@ app.post('/api/empleados', requireDB, async (req, res) => {
             return res.status(400).json({ error: 'El campo tipodesangre es obligatorio.' });
         }
 
-        const existente = await Empleado.findOne({ Clave: datos.Clave });
-        if (existente) {
-            return res.status(409).json({ error: `La Clave ${datos.Clave} ya existe.` });
-        }
-
         const nuevoEmpleado = new Empleado(datos);
         const guardado = await nuevoEmpleado.save();
         res.status(201).json(guardado);
@@ -180,16 +174,6 @@ app.put('/api/empleados/:identificador', requireDB, async (req, res) => {
         const { identificador } = req.params;
         const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
         const datosActualizados = normalizarEmpleado(req.body);
-
-        if (datosActualizados.Clave !== undefined) {
-            const choque = await Empleado.findOne({
-                Clave: datosActualizados.Clave,
-                ...((filtro._id) ? { _id: { $ne: filtro._id } } : { Clave: { $ne: filtro.Clave } })
-            });
-            if (choque) {
-                return res.status(409).json({ error: `La Clave ${datosActualizados.Clave} ya está en uso.` });
-            }
-        }
 
         const empleadoActualizado = await Empleado.findOneAndUpdate(
             filtro,
