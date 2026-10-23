@@ -13,6 +13,12 @@ app.use((req, res, next) => {
     if (req.url.endsWith(':')) {
         req.url = req.url.slice(0, -1);
     }
+    const lowerUrl = req.url.toLowerCase();
+    if (lowerUrl.startsWith('/empleados')) {
+        req.url = '/api' + lowerUrl;
+    } else if (lowerUrl.startsWith('/api/empleados')) {
+        req.url = lowerUrl;
+    }
     next();
 });
 
