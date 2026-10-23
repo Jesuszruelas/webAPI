@@ -18,7 +18,7 @@ Servicio API REST desarrollado con Node.js y Express, conectado a una base de da
 
 ## Esquema NoSQL Flexible
 
-Al utilizar una base de datos No Relacional orientada a documentos, el esquema es flexible y los campos son opcionales:
+Al utilizar una base de datos No Relacional orientada a documentos:
 
 - Clave: Numerica (opcional)
 - Nombre: Texto (opcional)
@@ -111,7 +111,3 @@ npm start
 
 Servidor en ejecucion: http://localhost:3000
 
-## Archivos de Entrega Incluidos
-
-- Servicio_API_Empleados_MongoDB_Atlas.pdf : Reporte formal con portada, enlaces, arquitectura y codigo fuente.
-- Empleados_API.postman_collection.json : Coleccion preconfigurada lista para importar en Postman.
