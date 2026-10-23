@@ -133,12 +133,24 @@ app.get('/api/empleados', requireDB, async (req, res) => {
 app.get('/api/empleados/:identificador', requireDB, async (req, res) => {
     try {
         const { identificador } = req.params;
-        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
-        const empleado = await Empleado.findOne(filtro);
-        if (!empleado) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+        const esClave = !isNaN(identificador);
+
+        if (esClave) {
+            const empleados = await Empleado.find({ Clave: Number(identificador) });
+            if (!empleados || empleados.length === 0) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+            return res.status(200).json(empleados);
+        } else {
+            if (!mongoose.Types.ObjectId.isValid(identificador)) {
+                return res.status(400).json({ error: 'Identificador no válido (debe ser Clave numérica o _id)' });
+            }
+            const empleado = await Empleado.findById(identificador);
+            if (!empleado) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+            return res.status(200).json(empleado);
         }
-        res.status(200).json(empleado);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -158,20 +170,37 @@ app.post('/api/empleados', requireDB, async (req, res) => {
 app.put('/api/empleados/:identificador', requireDB, async (req, res) => {
     try {
         const { identificador } = req.params;
-        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
+        const esClave = !isNaN(identificador);
         const datosActualizados = normalizarEmpleado(req.body);
 
-        const empleadoActualizado = await Empleado.findOneAndUpdate(
-            filtro,
-            { $set: datosActualizados },
-            { returnDocument: 'after', runValidators: true }
-        );
+        if (esClave) {
+            const resultado = await Empleado.updateMany(
+                { Clave: Number(identificador) },
+                { $set: datosActualizados }
+            );
 
-        if (!empleadoActualizado) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+            if (resultado.matchedCount === 0) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+
+            const empleadosActualizados = await Empleado.find({ Clave: Number(identificador) });
+            return res.status(200).json(empleadosActualizados);
+        } else {
+            if (!mongoose.Types.ObjectId.isValid(identificador)) {
+                return res.status(400).json({ error: 'Identificador no válido (debe ser Clave numérica o _id)' });
+            }
+            const empleadoActualizado = await Empleado.findByIdAndUpdate(
+                identificador,
+                { $set: datosActualizados },
+                { returnDocument: 'after', runValidators: true }
+            );
+
+            if (!empleadoActualizado) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+
+            return res.status(200).json(empleadoActualizado);
         }
-
-        res.status(200).json(empleadoActualizado);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -180,17 +209,33 @@ app.put('/api/empleados/:identificador', requireDB, async (req, res) => {
 app.delete('/api/empleados/:identificador', requireDB, async (req, res) => {
     try {
         const { identificador } = req.params;
-        const filtro = !isNaN(identificador) ? { Clave: Number(identificador) } : { _id: identificador };
+        const esClave = !isNaN(identificador);
 
-        const empleadoEliminado = await Empleado.findOneAndDelete(filtro);
-        if (!empleadoEliminado) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+        if (esClave) {
+            const empleadosAEliminar = await Empleado.find({ Clave: Number(identificador) });
+            if (!empleadosAEliminar || empleadosAEliminar.length === 0) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+
+            await Empleado.deleteMany({ Clave: Number(identificador) });
+            return res.status(200).json({
+                mensaje: `Se eliminaron ${empleadosAEliminar.length} empleado(s) con Clave ${identificador}`,
+                empleados: empleadosAEliminar
+            });
+        } else {
+            if (!mongoose.Types.ObjectId.isValid(identificador)) {
+                return res.status(400).json({ error: 'Identificador no válido (debe ser Clave numérica o _id)' });
+            }
+            const empleadoEliminado = await Empleado.findByIdAndDelete(identificador);
+            if (!empleadoEliminado) {
+                return res.status(404).json({ error: 'Empleado no encontrado' });
+            }
+
+            return res.status(200).json({
+                mensaje: 'Empleado eliminado',
+                empleado: empleadoEliminado
+            });
         }
-
-        res.status(200).json({
-            mensaje: 'Empleado eliminado',
-            empleado: empleadoEliminado
-        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
