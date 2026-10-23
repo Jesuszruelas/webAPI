@@ -37,44 +37,40 @@ async function connectToDatabase() {
 
 const empleadoSchema = new mongoose.Schema({
     Clave: {
-        type: Number,
-        required: [true, 'El campo Clave es obligatorio']
+        type: Number
     },
     Nombre: {
         type: String,
-        required: [true, 'El campo Nombre es obligatorio'],
         trim: true
     },
     dirección: {
         type: String,
-        required: [true, 'El campo dirección es obligatorio'],
         trim: true,
         alias: 'direccion'
     },
     fechadenacimiento: {
-        type: Date,
-        required: [true, 'El campo fechadenacimiento es obligatorio']
+        type: Date
     },
     sexo: {
-        type: mongoose.Schema.Types.Mixed,
-        required: [true, 'El campo sexo es obligatorio']
+        type: mongoose.Schema.Types.Mixed
     },
     tipodesangre: {
         type: String,
-        required: [true, 'El campo tipodesangre es obligatorio'],
         trim: true
     }
 }, {
     timestamps: true,
-    versionKey: false
+    versionKey: false,
+    strict: false
 });
 
 const Empleado = mongoose.models.Empleado || mongoose.model('Empleado', empleadoSchema, 'Empleados');
 
 function normalizarEmpleado(data) {
-    const normalizado = {};
+    const normalizado = { ...data };
     if (data.Clave !== undefined || data.clave !== undefined) {
-        normalizado.Clave = Number(data.Clave !== undefined ? data.Clave : data.clave);
+        const c = data.Clave !== undefined ? data.Clave : data.clave;
+        normalizado.Clave = !isNaN(c) ? Number(c) : c;
     }
     if (data.Nombre !== undefined || data.nombre !== undefined) {
         normalizado.Nombre = String(data.Nombre !== undefined ? data.Nombre : data.nombre).trim();
@@ -83,7 +79,11 @@ function normalizarEmpleado(data) {
         normalizado.dirección = String(data.dirección !== undefined ? data.dirección : data.direccion).trim();
     }
     if (data.fechadenacimiento || data.fechaDeNacimiento || data.fecha_nacimiento) {
-        normalizado.fechadenacimiento = new Date(data.fechadenacimiento || data.fechaDeNacimiento || data.fecha_nacimiento);
+        const rawDate = data.fechadenacimiento || data.fechaDeNacimiento || data.fecha_nacimiento;
+        const parsed = new Date(rawDate);
+        if (!isNaN(parsed.getTime())) {
+            normalizado.fechadenacimiento = parsed;
+        }
     }
     if (data.sexo !== undefined || data.Sexo !== undefined) {
         normalizado.sexo = data.sexo !== undefined ? data.sexo : data.Sexo;
@@ -147,26 +147,6 @@ app.get('/api/empleados/:identificador', requireDB, async (req, res) => {
 app.post('/api/empleados', requireDB, async (req, res) => {
     try {
         const datos = normalizarEmpleado(req.body);
-
-        if (datos.Clave === undefined || isNaN(datos.Clave)) {
-            return res.status(400).json({ error: 'El campo Clave es obligatorio y debe ser numérico.' });
-        }
-        if (!datos.Nombre) {
-            return res.status(400).json({ error: 'El campo Nombre es obligatorio.' });
-        }
-        if (!datos.dirección) {
-            return res.status(400).json({ error: 'El campo dirección es obligatorio.' });
-        }
-        if (!datos.fechadenacimiento || isNaN(datos.fechadenacimiento.getTime())) {
-            return res.status(400).json({ error: 'El campo fechadenacimiento es obligatorio y debe ser una fecha válida.' });
-        }
-        if (datos.sexo === undefined || datos.sexo === null || datos.sexo === '') {
-            return res.status(400).json({ error: 'El campo sexo es obligatorio.' });
-        }
-        if (!datos.tipodesangre) {
-            return res.status(400).json({ error: 'El campo tipodesangre es obligatorio.' });
-        }
-
         const nuevoEmpleado = new Empleado(datos);
         const guardado = await nuevoEmpleado.save();
         res.status(201).json(guardado);

@@ -11,12 +11,14 @@ Servicio API REST desarrollado con Node.js y Express, conectado a una base de da
 
 ## Esquema de la Coleccion (Empleados)
 
-- Clave: Numerica (obligatoria)
-- Nombre: Texto (obligatorio)
-- direccion: Texto (obligatorio)
-- fechadenacimiento: BSON Date (obligatorio, formato YYYY-MM-DD)
-- sexo: Numerico o Texto (obligatorio)
-- tipodesangre: Texto (obligatorio)
+Al utilizar una base de datos NoSQL (MongoDB Atlas), el esquema es flexible y los campos no son estrictamente obligatorios:
+
+- Clave: Numerica (opcional)
+- Nombre: Texto (opcional)
+- direccion: Texto (opcional)
+- fechadenacimiento: BSON Date (opcional, formato YYYY-MM-DD)
+- sexo: Numerico o Texto (opcional)
+- tipodesangre: Texto (opcional)
 
 ## Endpoints Disponibles
 
