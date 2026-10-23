@@ -12,6 +12,14 @@ app.set('json spaces', 2);
 app.use(cors());
 app.use(express.json());
 
+// Normalizar URLs (elimina dos puntos ':' accidentales al final de la URL si se pegan desde la documentación)
+app.use((req, res, next) => {
+    if (req.url.endsWith(':')) {
+        req.url = req.url.slice(0, -1);
+    }
+    next();
+});
+
 // ==========================================
 // Conexión reutilizable a MongoDB Atlas (Serverless-friendly)
 // ==========================================
